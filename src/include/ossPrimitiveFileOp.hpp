@@ -1,21 +1,5 @@
-/*******************************************************************************
-   Copyright (C) 2013 SequoiaDB Software Inc.
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License, version 3,
-   as published by the Free Software Foundation.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-   GNU Affero General Public License for more details.
-
-   You should have received a copy of the GNU Affero General Public License
-   along with this program. If not, see <http://www.gnu.org/license/>.
-*******************************************************************************/
-
-#ifndef OSSPRIMITIVEFILEOP_HPP__
-#define OSSPRIMITIVEFILEOP_HPP__
+#ifndef OSSPRIMITIVEFILEOP_HPP_
+#define OSSPRIMITIVEFILEOP_HPP_
 
 #include "core.hpp"
 
@@ -98,50 +82,37 @@
 #define OSS_PRIMITIVE_FILE_OP_OPEN_ALWAYS   (((unsigned int)1) << 4)
 #define OSS_PRIMITIVE_FILE_OP_OPEN_TRUNC    (((unsigned int)1) << 5)
 
-typedef oss_off_t offsetType ;
+
+typedef oss_off_t offsetType;	//偏移类型
 
 class ossPrimitiveFileOp
 {
-public :
-   typedef  OSS_HANDLE    handleType ;
-private :
-   handleType _fileHandle ;
-   ossPrimitiveFileOp( const ossPrimitiveFileOp & ) {}
-   const ossPrimitiveFileOp &operator=( const ossPrimitiveFileOp & ) ;
-   bool _bIsStdout ;
+public:
+	typedef OSS_HANDLE handleType;	//文件句柄的类型，就是文件描述符的类型，int
+private:
+	handleType _fileHandle;
+	//定义私有化的拷贝复制函数
+	ossPrimitiveFileOp(const ossPrimitiveFileOp&){}
+	//重载=拷贝操作符函数，目的都是防止隐式的文件拷贝
+	const ossPrimitiveFileOp &operator=(const ossPrimitiveFileOp &);
+	bool _bIsStdout;//是一个标准输出的流还是一个文件流，用于下面的openStdout
 
-protected :
-   void setFileHandle( handleType handle ) ;
+protected:
+	void setFileHandle(handleType handle);	//通过一个已知的文件，生成这样一个对象
 
-public :
-   ossPrimitiveFileOp() ;
-   int Open
-   (
-      const char * pFilePath,
-      unsigned int options = OSS_PRIMITIVE_FILE_OP_OPEN_ALWAYS
-   ) ;
-   void openStdout() ;
-   void Close() ;
-   bool isValid( void ) ;
-   int Read( const size_t size, void * const pBuf, int * const pBytesRead ) ;
-
-   int Write( const void * pBuf, size_t len = 0 ) ;
-
-   int fWrite( const char * fmt, ... ) ;
-
-   offsetType getCurrentOffset (void) const ;
-
-   void seekToOffset( offsetType offset ) ;
-
-   void seekToEnd( void ) ;
-
-   int getSize( offsetType * const pFileSize ) ;
-
-   handleType getHandle( void ) const
-   {
-      return _fileHandle ;
-   }
-} ;
-
-
+public:
+	ossPrimitiveFileOp();//构造的操作对象为空
+	int Open(const char *pFilePath,unsigned int options=OSS_PRIMITIVE_FILE_OP_OPEN_ALWAYS);
+	void openStdout();//将屏幕作为一个文件输出打开，向这个文件输入直接会到屏幕上，与_bIsStdout对应
+	void Close();
+	bool isValid(void);
+	int Read(const size_t size,void* const pBuf,int* const pBytedRead);//向pBuf读取一定size，最后返回已读长度
+	int Write(const void* pBuf,size_t len=0);
+	int fWrite(const char* fmt,...);//给定一个格式，向文件写入
+	offsetType getCurrentOffset (void) const;//得到当前偏移
+	void seekToOffset(offsetType offset);	//寻找偏移
+	void seekToEnd(void);//寻找到最后
+	int getSize(offsetType* const pFileSize);
+	handleType getHandle(void) const{	return _fileHandle;	}
+};
 #endif

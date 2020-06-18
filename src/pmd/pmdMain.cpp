@@ -1,18 +1,3 @@
-/*******************************************************************************
-   Copyright (C) 2013 SequoiaDB Software Inc.
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License, version 3,
-   as published by the Free Software Foundation.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-   GNU Affero General Public License for more details.
-
-   You should have received a copy of the GNU Affero General Public License
-   along with this program. If not, see <http://www.gnu.org/license/>.
-*******************************************************************************/
 #include "core.hpp"
 #include "pmd.hpp"
 #include "pmdOptions.hpp"
@@ -21,35 +6,39 @@
 
 static int pmdResolveArguments ( int argc, char **argv )
 {
-   int rc = EDB_OK ;
-
-   pmdOptions options ;
-   rc = options.init ( argc, argv ) ;
-   if ( rc )
-   {
-      if ( EDB_PMD_HELP_ONLY != rc )
-         PD_LOG ( PDERROR, "Failed to init options, rc = %d", rc ) ;
-      goto error ;
-   }
-   rc = pmdGetKRCB()->init ( &options ) ;
-   if( rc )
-   {
-      PD_LOG ( PDERROR, "Failed to init krcb, rc = %d", rc ) ;
-      goto error ;
-   }
-done :
-   return rc ;
-error :
-   goto done ;
+	int rc=EDB_OK;
+	
+	pmdOptions options;
+	//将参数传入options
+	rc=options.init(argc,argv);
+	if(rc)
+	{
+		if(EDB_PMD_HELP_ONLY!=rc)
+			PD_LOG(PDERROR,"Failed to init options,rc=%d",rc);
+		goto error;
+	}
+	//将options里的内容传入内核
+	rc=pmdGetKRCB()->init(&options);
+	if(rc)
+	{
+		PD_LOG(PDERROR,"Failed to init krcb,rc=%d",rc);
+		goto error;
+	}
+done:
+	return rc;
+error:
+	goto done;
 }
 
+//信号信息 包含名字和句柄
 struct _signalInfo
 {
-   const char *name ;
-   int       handle ;
-} ;
-typedef struct _signalInfo _signalInfo ;
+	const char *name;
+	int handle;
+};
+typedef struct _signalInfo _signalInfo;
 
+//信号处理map，对应信号名+句柄 数组中的位置
 static _signalInfo signalHandleMap [] = {
    { "Unknow", 0 },
    { "SIGHUP", 1 },     //1
@@ -119,84 +108,61 @@ static _signalInfo signalHandleMap [] = {
 };
 
 #define PMD_MAX_SIGNALS 64
-
-#ifndef _WINDOWS
-static void pmdSignalHandler ( int sigNum )
+//真正的信号处理函数
+static void pmdSignalHandler(int sigNum)
 {
-   if ( sigNum > 0 && sigNum <= PMD_MAX_SIGNALS )
-   {
-      if ( signalHandleMap[sigNum].handle )
-      {
-         EDB_SHUTDOWN_DB ;
-      }
-   }
+	//逻辑很简单，在map内，只要句柄为1的我们都设置为关闭
+	if(sigNum>0&&sigNum<=PMD_MAX_SIGNALS)
+	{
+		if(signalHandleMap[sigNum].handle)	EDB_SHUTDOWN_DB;
+	}
 }
-#else
-static BOOL WINAPI pmdSignalHandler(DWORD dwCtrlType)
+
+//
+static int pmdSetupSignalHandler()
 {
-	PD_LOG ( PDERROR, "Shutdown Database" ) ;
-	EDB_SHUTDOWN_DB ;
-	return TRUE;
+	int rc=EDB_OK;
+	//信号响应结构
+	struct sigaction newact;
+	memset(&newact,0,sizeof(newact));
+	//将mask清空
+	sigemptyset(&newact.sa_mask);
+	
+	newact.sa_flags=0;
+	//信号处理函数替换
+	newact.sa_handler=(__sighandler_t)pmdSignalHandler;
+	//将每个信号的响应函数先置为空
+	for(int i=0;i<PMD_MAX_SIGNALS;++i)	sigaction(i+1,&newact,NULL);
+	return rc;
 }
-#endif // _WINDOWS
 
-#ifndef _WINDOWS
-static int pmdSetupSignalHandler ()
+int pmdMasterThreadMain(int argc,char **argv)
 {
-   int rc = EDB_OK ;
-   struct sigaction newact ;
-   memset ( &newact, 0, sizeof(newact) ) ;
-   sigemptyset ( &newact.sa_mask ) ;
+	int rc=EDB_OK;
+	EDB_KRCB *krcb=pmdGetKRCB();
+   pmdEDUMgr *eduMgr=krcb->getEDUMgr();
+   EDUID agentEDU=PMD_INVALID_EDUID;
 
-   newact.sa_flags = 0 ;
-   newact.sa_handler = (__sighandler_t ) pmdSignalHandler ;
-   for ( int i = 0; i < PMD_MAX_SIGNALS; ++i )
-   {
-      sigaction ( i+1, &newact, NULL ) ;
-   }
-   return rc ;
-}
-#endif
-
-
-int pmdMasterThreadMain ( int argc, char **argv )
-{
-   int rc = EDB_OK ;
-   EDB_KRCB *krcb = pmdGetKRCB () ;
-   pmdEDUMgr *eduMgr   = krcb->getEDUMgr () ;
-   EDUID      agentEDU = PMD_INVALID_EDUID ;
-#ifndef _WINDOWS
-
-   // signal handler
-   rc = pmdSetupSignalHandler () ;
-   PD_RC_CHECK ( rc, PDERROR, "Failed to setup signal handler, rc = %d", rc ) ;
-
-#else
-   SetConsoleCtrlHandler(&pmdSignalHandler, TRUE);
-#endif	// _WINDOWS
-
-   // arguments
-   rc = pmdResolveArguments ( argc, argv ) ;
-   if ( EDB_PMD_HELP_ONLY == rc )
-   {
-      goto done ;
-   }
-   PD_RC_CHECK ( rc, PDERROR, "Failed to resolve argument, rc = %d", rc ) ;
+	//信号处理
+	rc=pmdSetupSignalHandler();
+	PD_RC_CHECK(rc,PDERROR,"Failed to setup signal handler,rc=%d",rc);
+	
+	//参数
+	rc=pmdResolveArguments(argc,argv);
+	if(EDB_PMD_HELP_ONLY==rc)	goto done;
+	PD_RC_CHECK(rc,PDERROR,"Failed to resolve argument,rc=%d",rc);
 
    rc = eduMgr->startEDU ( EDU_TYPE_TCPLISTENER, NULL, &agentEDU ) ;
    PD_RC_CHECK ( rc, PDERROR, "Failed to start tcplistener edu, rc = %d", rc ) ;
-   while ( EDB_IS_DB_UP )
-   {
-      sleep(1) ;
-   }
+	while(EDB_IS_DB_UP){	sleep(1);	}
    eduMgr->reset () ;
-done :
-   return rc ;
-error :
-   goto done ;
+done:
+	return rc;
+error:
+	goto done;
 }
 
-int main ( int argc, char **argv )
+int main(int argc,char **argv)
 {
-   return pmdMasterThreadMain ( argc, argv ) ;
+	return pmdMasterThreadMain(argc,argv);
 }

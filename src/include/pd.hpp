@@ -1,53 +1,42 @@
-/*******************************************************************************
-   Copyright (C) 2013 SequoiaDB Software Inc.
+#ifndef PD_HPP_
+#define PD_HPP_
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License, version 3,
-   as published by the Free Software Foundation.
+#include"core.hpp"
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-   GNU Affero General Public License for more details.
+#define PD_LOG_STRINGMAX 4096	//日志最长长度
 
-   You should have received a copy of the GNU Affero General Public License
-   along with this program. If not, see <http://www.gnu.org/license/>.
-*******************************************************************************/
+//输入需要的日志等级、格式、其它参数
+//如果当前设置的等级大于输入等级，则pdLog
+#define PD_LOG(level,fmt,...)				\
+	do{						\
+		if(_curPDLevel>=level)			\
+		{ 					\
+			pdLog(level,__func__,__FILE__,__LINE__,fmt,##__VA_ARGS__);	\
+		}					\
+	}while(0)					\
 
-#ifndef PD_HPP__
-#define PD_HPP__
+//检查条件是否成立
+//如果不成立会返回一个retCode,并跳转到一个Label,出现一条日志
+#define PD_CHECK(cond,retCode,gotoLabel,level,fmt,...)	\
+	do{						\
+		if(!(cond))				\
+		{					\
+			rc=(retCode);			\
+			PD_LOG((level),fmt,##__VA_ARGS__);	\
+			goto gotoLabel;			\
+		}					\
+	}while(0)					\
 
-#include "core.hpp"
+//检查retCode是否为OK,如果不是则打印retCode和它的日志
+#define PD_RC_CHECK(rc,level,fmt,...)			\
+	do{						\
+		PD_CHECK((EDB_OK==(rc)),(rc),error,(level),fmt,##__VA_ARGS__);	\
+	}while(0)					\
 
-#define PD_LOG_STRINGMAX 4096
-
-#define PD_LOG(level,fmt,...)                                         \
-   do {                                                               \
-      if ( _curPDLevel >= level )                                     \
-      {                                                               \
-         pdLog ( level, __func__, __FILE__, __LINE__, fmt, ##__VA_ARGS__); \
-      }                                                               \
-   } while ( 0 )                                                      \
-
-#define PD_CHECK(cond,retCode,gotoLabel,level,fmt,...)                \
-   do {                                                               \
-      if ( !(cond) )                                                  \
-      {                                                               \
-         rc = (retCode) ;                                             \
-         PD_LOG  ( (level), fmt, ##__VA_ARGS__) ;                     \
-         goto gotoLabel ;                                             \
-      }                                                               \
-   } while ( 0 )                                                      \
-
-#define PD_RC_CHECK(rc,level,fmt,...)                                 \
-   do {                                                               \
-      PD_CHECK ( (EDB_OK==(rc)), (rc), error, (level),                \
-                 fmt, ##__VA_ARGS__) ;                                \
-   } while ( 0 )                                                      \
-
-#define EDB_VALIDATE_GOTOERROR(cond,ret,str)                          \
-   {if(!(cond)) { pdLog(PDERROR, __func__, __FILE__, __LINE__, str) ; \
-    rc = ret; goto error ; }}
+//检查条件，如果不满足则打印日志，并跳转到error
+#define EDB_VALIDATE_GOTOERROR(cond,ret,str)		\
+	{if(!(cond))	{pdLog(PDERROR,__func__,__FILE__,__LINE__,str);	\
+		rc=ret;goto error;}}			\
 
 #define EDB_ASSERT(cond,str)  {if(cond){}}
 #define EDB_CHECK(cond,str)   {if(cond){}}
@@ -62,12 +51,12 @@ enum PDLEVEL
    PDDEBUG
 } ;
 
-extern PDLEVEL _curPDLevel ;
+extern PDLEVEL _curPDLevel;
 const char *getPDLevelDesp ( PDLEVEL level ) ;
 
 #define PD_DFT_DIAGLEVEL PDWARNING
-void pdLog ( PDLEVEL level, const char *func, const char *file,
-             unsigned int line, const char *format, ... ) ;
-void pdLog ( PDLEVEL level, const char *func, const char *file,
-             unsigned int line, std::string message ) ;
+//一个是format+...,一个是string
+void pdLog(PDLEVEL level,const char *func,const char *file,unsigned int line,const char *format,...);
+void pdLog(PDLEVEL level,const char *func,const char *file,unsigned int line,std::string message);
+
 #endif

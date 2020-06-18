@@ -22,10 +22,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/xtime.hpp>
 
-#ifdef _WIN32
-#include <boost/thread/thread.hpp>	// for sleep
-#endif
-
 namespace bson {
 
     inline void time_t_to_Struct(time_t t, struct tm * buf , bool local = false)
@@ -103,7 +99,7 @@ namespace bson {
         if ( s <= 0 )
             return;
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         xt.sec += (int)( s / 1000000 );
         xt.nsec += (int)(( s % 1000000 ) * 1000);
         if ( xt.nsec >= 1000000000 ) {
@@ -115,13 +111,13 @@ namespace bson {
 #elif defined(__sunos__)
     inline void sleepsecs(int s) {
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         xt.sec += s;
         boost::thread::sleep(xt);
     }
     inline void sleepmillis(long long s) {
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         xt.sec += (int)( s / 1000 );
         xt.nsec += (int)(( s % 1000 ) * 1000000);
         if ( xt.nsec >= 1000000000 ) {
@@ -134,7 +130,7 @@ namespace bson {
         if ( s <= 0 )
             return;
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         xt.sec += (int)( s / 1000000 );
         xt.nsec += (int)(( s % 1000000 ) * 1000);
         if ( xt.nsec >= 1000000000 ) {
@@ -177,7 +173,7 @@ namespace bson {
         about that. */
     inline unsigned curTimeMillis() {
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         unsigned t = xt.nsec / 1000000;
         return (xt.sec & 0xfffff) * 1000 + t;
     }
@@ -185,14 +181,14 @@ namespace bson {
     /** Date_t is milliseconds since epoch */
     inline Date_t jsTime() {
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         unsigned long long t = xt.nsec / 1000000;
         return ((unsigned long long) xt.sec * 1000) + t;
     }
 
     inline unsigned long long curTimeMicros64() {
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         unsigned long long t = xt.nsec / 1000;
         return (((unsigned long long) xt.sec) * 1000000) + t;
     }
@@ -200,7 +196,7 @@ namespace bson {
     // measures up to 1024 seconds.  or, 512 seconds with tdiff that is...
     inline unsigned curTimeMicros() {
         boost::xtime xt;
-        boost::xtime_get(&xt, boost::TIME_UTC_);
+        boost::xtime_get(&xt, boost::TIME_UTC_ );
         unsigned t = xt.nsec / 1000;
         unsigned secs = xt.sec % 1024;
         return secs*1000000 + t;

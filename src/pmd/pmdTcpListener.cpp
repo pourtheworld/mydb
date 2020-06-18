@@ -1,46 +1,38 @@
-/*******************************************************************************
-   Copyright (C) 2013 SequoiaDB Software Inc.
-
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Affero General Public License, version 3,
-   as published by the Free Software Foundation.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-   GNU Affero General Public License for more details.
-
-   You should have received a copy of the GNU Affero General Public License
-   along with this program. If not, see <http://www.gnu.org/license/>.
-*******************************************************************************/
-#include "core.hpp"
-#include "ossSocket.hpp"
-#include "pmdEDU.hpp"
-#include "pmd.hpp"
-#include "pmdEDUMgr.hpp"
-#include "pd.hpp"
-
+#include"core.hpp"
+#include"ossSocket.hpp"
+#include"pmdEDU.hpp"
+#include"pmd.hpp"
+#include"pmdEDUMgr.hpp"
+#include"pd.hpp"
 
 #define PMD_TCPLISTENER_RETRY 5
 #define OSS_MAX_SERVICENAME NI_MAXSERV
 
-int pmdTcpListenerEntryPoint ( pmdEDUCB *cb, void *arg )
+//TCP监听入口
+//先从内核获取服务名，并转换成端口号
+//用该端口号给当前EDU的sock，作为Bind_listen，将当前EDU设置为run
+//再开一个循环用于accept，每听到一个,start一个新agentEDU,把sock赋给它
+//如果从accept出来了，说明出错，将当前EDU设置为wait
+int pmdTcpListenerEntryPoint(pmdEDUCB *cb,void *arg)
 {
    int          rc        = EDB_OK ;
    pmdEDUMgr *  eduMgr    = cb->getEDUMgr() ;
    EDUID        myEDUID   = cb->getID() ;
    unsigned int retry     = 0 ;
    EDUID        agentEDU  = PMD_INVALID_EDUID ;
-   char         svcName[OSS_MAX_SERVICENAME+1] ;
+   char         svcName[OSS_MAX_SERVICENAME+1] ;//服务名
+
+//每次循环检查 重试次数是否到达上限；数据库是否已经关闭
    while ( retry <= PMD_TCPLISTENER_RETRY && !EDB_IS_DB_DOWN )
    {
       retry ++ ;
-
+	  //从内核获得服务名
       strcpy( svcName, pmdGetKRCB()->getSvcName() ) ;
       PD_LOG ( PDEVENT, "Listening on port_test %s\n", svcName ) ;
 
       int port = 0 ;
       int len = strlen ( svcName ) ;
+	  //将服务名转换成端口
       for ( int i = 0; i<len; ++i )
       {
          if ( svcName[i] >= '0' && svcName[i] <= '9' )
@@ -54,6 +46,7 @@ int pmdTcpListenerEntryPoint ( pmdEDUCB *cb, void *arg )
          }
       }
 
+	  //将端口赋予sock，此sock用于bind_listen
       ossSocket sock ( port ) ;
       rc = sock.initSocket () ;
       EDB_VALIDATE_GOTOERROR ( EDB_OK==rc, rc, "Failed initialize socket" )
@@ -61,23 +54,24 @@ int pmdTcpListenerEntryPoint ( pmdEDUCB *cb, void *arg )
       rc = sock.bind_listen () ;
       EDB_VALIDATE_GOTOERROR ( EDB_OK==rc, rc,
                                "Failed to bind/listen socket");
-      // once bind is successful, let's set the state of EDU to RUNNING
+      // 监听成功后，该EDU转换成run
       if ( EDB_OK != ( rc = eduMgr->activateEDU ( myEDUID )) )
       {
          goto error ;
       }
-      // master loop for tcp listener
+
+     //这个循环用于监听
       while ( !EDB_IS_DB_DOWN )
       {
          int s ;
-         rc = sock.accept ( (SOCKET*)&s, NULL, NULL ) ;
-         // if we don't get anything for a period of time, let's loop
+         rc = sock.accept ( &s, NULL, NULL ) ;
+         //每次10ms，超时continue
          if ( EDB_TIMEOUT == rc )
          {
             rc = EDB_OK ;
             continue ;
          }
-         // if we receive error due to database down, we finish
+         //有错误并且数据库关闭则退出循环
          if ( rc && EDB_IS_DB_DOWN )
          {
             rc = EDB_OK ;
@@ -85,39 +79,41 @@ int pmdTcpListenerEntryPoint ( pmdEDUCB *cb, void *arg )
          }
          else if ( rc )
          {
-            // if we fail due to error, let's restart socket
+            
             PD_LOG ( PDERROR, "Failed to accept socket in TcpListener" ) ;
             PD_LOG ( PDEVENT, "Restarting socket to listen" ) ;
             break ;
          }
 
-         // assign the socket to the arg
+         // 把接收到的句柄赋给pData
          void *pData = NULL ;
          *((int *) &pData) = s ;
 
+		//让线程池再启动一个agent的EDU，赋予它刚才的sock
          rc = eduMgr->startEDU ( EDU_TYPE_AGENT, pData, &agentEDU ) ;
          if ( rc )
          {
             if ( rc == EDB_QUIESCED )
             {
-               // we cannot start EDU due to quiesced
+               
                PD_LOG ( PDWARNING, "Reject new connection due to quiesced database" ) ;
             }
             else
             {
                PD_LOG ( PDERROR, "Failed to start EDU agent" ) ;
             }
-            // close remote connection if we can't create new thread
-            ossSocket newsock ( (SOCKET*)&s ) ;
+            //如果刚才分配新的thread失败了，只能将这个新的sock关闭
+            ossSocket newsock ( &s ) ;
             newsock.close () ;
             continue ;
          }
       }
+	  //讲道理accept是一直循环的，到这里说明出问题了，那么将状态设置成wait
       if ( EDB_OK != ( rc = eduMgr->waitEDU ( myEDUID )) )
       {
          goto error ;
       }
-   } // while ( retry <= PMD_TCPLISTENER_RETRY )
+   } 
 done :
    return rc;
 error :
