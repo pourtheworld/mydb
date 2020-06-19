@@ -196,3 +196,432 @@ File:pmd/pmdAgent.cpp
 Message:
 Process Agent Request
 
+2020-06-17-23.56.20.531449	Level:EVENT
+PID:3928                                 TID:3931
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-01.23.42.006228	Level:EVENT
+PID:3928                                 TID:3931
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-01.23.42.008031	Level:WARNING
+PID:3928                                 TID:3931
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-18-01.23.47.249577	Level:EVENT
+PID:3928                                 TID:3931
+Function:pmdEDUEntryPoint                Line:162
+File:pmd/pmdEDU.cpp
+Message:
+EDU 2 is forced
+
+2020-06-18-07.32.33.516760	Level:EVENT
+PID:11626                                TID:11627
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-07.39.33.126261	Level:WARNING
+PID:11626                                TID:11629
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-18-07.47.56.769435	Level:WARNING
+PID:11626                                TID:11629
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-18-07.54.40.245215	Level:EVENT
+PID:11626                                TID:11629
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-07.55.46.985864	Level:WARNING
+PID:11626                                TID:11629
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-18-07.55.48.801042	Level:EVENT
+PID:11626                                TID:11629
+Function:pmdEDUEntryPoint                Line:162
+File:pmd/pmdEDU.cpp
+Message:
+EDU 2 is forced
+
+2020-06-18-18.56.55.969435	Level:EVENT
+PID:13104                                TID:13108
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-18.58.00.611372	Level:EVENT
+PID:13104                                TID:13111
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-19.09.17.635728	Level:EVENT
+PID:13104                                TID:13111
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-19.09.30.794221	Level:EVENT
+PID:13104                                TID:13111
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-19.11.43.408701	Level:EVENT
+PID:13135                                TID:13136
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.12.27.260339	Level:EVENT
+PID:13144                                TID:13148
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.13.50.892655	Level:EVENT
+PID:13152                                TID:13156
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.13.50.893369	Level:ERROR
+PID:13152                                TID:13156
+Function:bind_listen                     Line:181
+File:oss/ossSocket.cpp
+Message:
+Failed to bind socket,rc=98
+
+2020-06-18-19.13.50.893970	Level:ERROR
+PID:13152                                TID:13156
+Function:pmdTcpListenerEntryPoint        Line:56
+File:pmd/pmdTcpListener.cpp
+Message:
+Failed to bind/listen socket
+
+2020-06-18-19.13.50.894567	Level:SEVERE
+PID:13152                                TID:13156
+Function:pmdTcpListenerEntryPoint        Line:126
+File:pmd/pmdTcpListener.cpp
+Message:
+Internal error
+
+2020-06-18-19.13.50.895161	Level:SEVERE
+PID:13152                                TID:13156
+Function:pmdEDUEntryPoint                Line:196
+File:pmd/pmdEDU.cpp
+Message:
+System EDU: 1,type TCPListener exits with -11
+
+2020-06-18-19.14.06.679754	Level:EVENT
+PID:13157                                TID:13158
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.14.06.680454	Level:ERROR
+PID:13157                                TID:13158
+Function:bind_listen                     Line:181
+File:oss/ossSocket.cpp
+Message:
+Failed to bind socket,rc=98
+
+2020-06-18-19.14.06.681028	Level:ERROR
+PID:13157                                TID:13158
+Function:pmdTcpListenerEntryPoint        Line:56
+File:pmd/pmdTcpListener.cpp
+Message:
+Failed to bind/listen socket
+
+2020-06-18-19.14.06.681654	Level:SEVERE
+PID:13157                                TID:13158
+Function:pmdTcpListenerEntryPoint        Line:126
+File:pmd/pmdTcpListener.cpp
+Message:
+Internal error
+
+2020-06-18-19.14.06.682256	Level:SEVERE
+PID:13157                                TID:13158
+Function:pmdEDUEntryPoint                Line:196
+File:pmd/pmdEDU.cpp
+Message:
+System EDU: 1,type TCPListener exits with -11
+
+2020-06-18-19.14.11.920504	Level:EVENT
+PID:13160                                TID:13161
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.14.11.923243	Level:ERROR
+PID:13160                                TID:13161
+Function:bind_listen                     Line:181
+File:oss/ossSocket.cpp
+Message:
+Failed to bind socket,rc=98
+
+2020-06-18-19.14.11.924282	Level:ERROR
+PID:13160                                TID:13161
+Function:pmdTcpListenerEntryPoint        Line:56
+File:pmd/pmdTcpListener.cpp
+Message:
+Failed to bind/listen socket
+
+2020-06-18-19.14.11.925329	Level:SEVERE
+PID:13160                                TID:13161
+Function:pmdTcpListenerEntryPoint        Line:126
+File:pmd/pmdTcpListener.cpp
+Message:
+Internal error
+
+2020-06-18-19.14.11.926330	Level:SEVERE
+PID:13160                                TID:13161
+Function:pmdEDUEntryPoint                Line:196
+File:pmd/pmdEDU.cpp
+Message:
+System EDU: 1,type TCPListener exits with -11
+
+2020-06-18-19.14.49.831805	Level:EVENT
+PID:13165                                TID:13169
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.14.49.832509	Level:ERROR
+PID:13165                                TID:13169
+Function:bind_listen                     Line:181
+File:oss/ossSocket.cpp
+Message:
+Failed to bind socket,rc=98
+
+2020-06-18-19.14.49.833124	Level:ERROR
+PID:13165                                TID:13169
+Function:pmdTcpListenerEntryPoint        Line:56
+File:pmd/pmdTcpListener.cpp
+Message:
+Failed to bind/listen socket
+
+2020-06-18-19.14.49.833703	Level:SEVERE
+PID:13165                                TID:13169
+Function:pmdTcpListenerEntryPoint        Line:126
+File:pmd/pmdTcpListener.cpp
+Message:
+Internal error
+
+2020-06-18-19.14.49.834289	Level:SEVERE
+PID:13165                                TID:13169
+Function:pmdEDUEntryPoint                Line:196
+File:pmd/pmdEDU.cpp
+Message:
+System EDU: 1,type TCPListener exits with -11
+
+2020-06-18-19.15.49.896797	Level:EVENT
+PID:13181                                TID:13182
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.15.49.897547	Level:ERROR
+PID:13181                                TID:13182
+Function:bind_listen                     Line:181
+File:oss/ossSocket.cpp
+Message:
+Failed to bind socket,rc=98
+
+2020-06-18-19.15.49.898187	Level:ERROR
+PID:13181                                TID:13182
+Function:pmdTcpListenerEntryPoint        Line:56
+File:pmd/pmdTcpListener.cpp
+Message:
+Failed to bind/listen socket
+
+2020-06-18-19.15.49.898786	Level:SEVERE
+PID:13181                                TID:13182
+Function:pmdTcpListenerEntryPoint        Line:126
+File:pmd/pmdTcpListener.cpp
+Message:
+Internal error
+
+2020-06-18-19.15.49.899398	Level:SEVERE
+PID:13181                                TID:13182
+Function:pmdEDUEntryPoint                Line:196
+File:pmd/pmdEDU.cpp
+Message:
+System EDU: 1,type TCPListener exits with -11
+
+2020-06-18-19.16.35.525091	Level:EVENT
+PID:3053                                 TID:3054
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-19.17.56.549251	Level:EVENT
+PID:3150                                 TID:3154
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-20.29.55.138883	Level:EVENT
+PID:3680                                 TID:3684
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-20.51.52.889227	Level:EVENT
+PID:3680                                 TID:3685
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-20.51.52.890696	Level:WARNING
+PID:3680                                 TID:3685
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-18-20.52.38.758796	Level:EVENT
+PID:3722                                 TID:3726
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-20.53.11.982642	Level:EVENT
+PID:3722                                 TID:3727
+Function:pmdProcessAgentRequest          Line:29
+File:pmd/pmdAgent.cpp
+Message:
+Process Agent Request
+
+2020-06-18-23.13.42.355992	Level:EVENT
+PID:9937                                 TID:9938
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-18-23.14.22.226877	Level:EVENT
+PID:9937                                 TID:9941
+Function:pmdProcessAgentRequest          Line:74
+File:pmd/pmdAgent.cpp
+Message:
+Insert: insertor: { hello: "world" }
+
+2020-06-18-23.14.35.592344	Level:EVENT
+PID:9937                                 TID:9941
+Function:pmdProcessAgentRequest          Line:97
+File:pmd/pmdAgent.cpp
+Message:
+Query condition: { id: 1 }
+
+2020-06-18-23.18.07.299783	Level:WARNING
+PID:9937                                 TID:9941
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-18-23.18.22.925389	Level:EVENT
+PID:11347                                TID:11348
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-19-00.43.32.355152	Level:WARNING
+PID:11347                                TID:11351
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-19-00.43.37.873634	Level:EVENT
+PID:11484                                TID:11485
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-19-00.43.59.023184	Level:EVENT
+PID:11484                                TID:11487
+Function:pmdProcessAgentRequest          Line:74
+File:pmd/pmdAgent.cpp
+Message:
+Insert: insertor: { hello: "world" }
+
+2020-06-19-00.44.50.479427	Level:EVENT
+PID:11484                                TID:11487
+Function:pmdProcessAgentRequest          Line:97
+File:pmd/pmdAgent.cpp
+Message:
+Query condition: { id: 1 }
+
+2020-06-19-00.48.56.662750	Level:WARNING
+PID:11484                                TID:11487
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-19-00.48.57.974577	Level:EVENT
+PID:11484                                TID:11487
+Function:pmdEDUEntryPoint                Line:162
+File:pmd/pmdEDU.cpp
+Message:
+EDU 2 is forced
+

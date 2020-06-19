@@ -100,7 +100,8 @@ am_edb_OBJECTS = edb-edb.$(OBJEXT) edb-command.$(OBJEXT) \
 	edb-commandFactory.$(OBJEXT) edb-bsonobj.$(OBJEXT) \
 	edb-json.$(OBJEXT) edb-oid.$(OBJEXT) edb-base64.$(OBJEXT) \
 	edb-md5.$(OBJEXT) edb-nonce.$(OBJEXT) edb-ossSocket.$(OBJEXT) \
-	edb-ossPrimitiveFileOp.$(OBJEXT) edb-pd.$(OBJEXT)
+	edb-ossPrimitiveFileOp.$(OBJEXT) edb-pd.$(OBJEXT) \
+	edb-msg.$(OBJEXT)
 edb_OBJECTS = $(am_edb_OBJECTS)
 edb_DEPENDENCIES =
 edb_LINK = $(CXXLD) $(edb_CXXFLAGS) $(CXXFLAGS) $(edb_LDFLAGS) \
@@ -112,7 +113,7 @@ am_mydb_OBJECTS = mydb-pmdMain.$(OBJEXT) mydb-pmdTcpListener.$(OBJEXT) \
 	mydb-json.$(OBJEXT) mydb-oid.$(OBJEXT) mydb-base64.$(OBJEXT) \
 	mydb-md5.$(OBJEXT) mydb-nonce.$(OBJEXT) \
 	mydb-ossSocket.$(OBJEXT) mydb-ossPrimitiveFileOp.$(OBJEXT) \
-	mydb-pd.$(OBJEXT)
+	mydb-pd.$(OBJEXT) mydb-msg.$(OBJEXT)
 mydb_OBJECTS = $(am_mydb_OBJECTS)
 mydb_DEPENDENCIES =
 mydb_LINK = $(CXXLD) $(mydb_CXXFLAGS) $(CXXFLAGS) $(mydb_LDFLAGS) \
@@ -302,14 +303,14 @@ mydb_SOURCES = \
 	bson/src/bsonobj.cpp bson/src/util/json.cpp bson/src/oid.cpp	\
 	bson/src/lib/base64.cpp bson/src/lib/md5.cpp bson/src/lib/nonce.cpp	\
 	oss/ossSocket.cpp oss/ossPrimitiveFileOp.cpp	\
-	pd/pd.cpp
+	pd/pd.cpp msg/msg.cpp
 
 edb_SOURCES = \
 	client/edb.cpp client/command.cpp client/commandFactory.cpp	\
 	bson/src/bsonobj.cpp bson/src/util/json.cpp bson/src/oid.cpp    \
         bson/src/lib/base64.cpp bson/src/lib/md5.cpp bson/src/lib/nonce.cpp     \
         oss/ossSocket.cpp oss/ossPrimitiveFileOp.cpp	\
-	pd/pd.cpp
+	pd/pd.cpp msg/msg.cpp
 
 mydb_CXXFLAGS = -I../boost -Ibson/src -Iinclude -D_FILE_OFFSET_BITS=64 -ggdb -Wall -O0
 mydb_LDADD = -lpthread -lm -lboost_system	-lboost_thread -lboost_program_options -lrt
@@ -435,6 +436,7 @@ include ./$(DEPDIR)/edb-commandFactory.Po
 include ./$(DEPDIR)/edb-edb.Po
 include ./$(DEPDIR)/edb-json.Po
 include ./$(DEPDIR)/edb-md5.Po
+include ./$(DEPDIR)/edb-msg.Po
 include ./$(DEPDIR)/edb-nonce.Po
 include ./$(DEPDIR)/edb-oid.Po
 include ./$(DEPDIR)/edb-ossPrimitiveFileOp.Po
@@ -444,6 +446,7 @@ include ./$(DEPDIR)/mydb-base64.Po
 include ./$(DEPDIR)/mydb-bsonobj.Po
 include ./$(DEPDIR)/mydb-json.Po
 include ./$(DEPDIR)/mydb-md5.Po
+include ./$(DEPDIR)/mydb-msg.Po
 include ./$(DEPDIR)/mydb-nonce.Po
 include ./$(DEPDIR)/mydb-oid.Po
 include ./$(DEPDIR)/mydb-ossPrimitiveFileOp.Po
@@ -638,6 +641,20 @@ edb-pd.obj: pd/pd.cpp
 #	$(AM_V_CXX)source='pd/pd.cpp' object='edb-pd.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(edb_CXXFLAGS) $(CXXFLAGS) -c -o edb-pd.obj `if test -f 'pd/pd.cpp'; then $(CYGPATH_W) 'pd/pd.cpp'; else $(CYGPATH_W) '$(srcdir)/pd/pd.cpp'; fi`
+
+edb-msg.o: msg/msg.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(edb_CXXFLAGS) $(CXXFLAGS) -MT edb-msg.o -MD -MP -MF $(DEPDIR)/edb-msg.Tpo -c -o edb-msg.o `test -f 'msg/msg.cpp' || echo '$(srcdir)/'`msg/msg.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/edb-msg.Tpo $(DEPDIR)/edb-msg.Po
+#	$(AM_V_CXX)source='msg/msg.cpp' object='edb-msg.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(edb_CXXFLAGS) $(CXXFLAGS) -c -o edb-msg.o `test -f 'msg/msg.cpp' || echo '$(srcdir)/'`msg/msg.cpp
+
+edb-msg.obj: msg/msg.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(edb_CXXFLAGS) $(CXXFLAGS) -MT edb-msg.obj -MD -MP -MF $(DEPDIR)/edb-msg.Tpo -c -o edb-msg.obj `if test -f 'msg/msg.cpp'; then $(CYGPATH_W) 'msg/msg.cpp'; else $(CYGPATH_W) '$(srcdir)/msg/msg.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/edb-msg.Tpo $(DEPDIR)/edb-msg.Po
+#	$(AM_V_CXX)source='msg/msg.cpp' object='edb-msg.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(edb_CXXFLAGS) $(CXXFLAGS) -c -o edb-msg.obj `if test -f 'msg/msg.cpp'; then $(CYGPATH_W) 'msg/msg.cpp'; else $(CYGPATH_W) '$(srcdir)/msg/msg.cpp'; fi`
 
 mydb-pmdMain.o: pmd/pmdMain.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-pmdMain.o -MD -MP -MF $(DEPDIR)/mydb-pmdMain.Tpo -c -o mydb-pmdMain.o `test -f 'pmd/pmdMain.cpp' || echo '$(srcdir)/'`pmd/pmdMain.cpp
@@ -862,6 +879,20 @@ mydb-pd.obj: pd/pd.cpp
 #	$(AM_V_CXX)source='pd/pd.cpp' object='mydb-pd.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-pd.obj `if test -f 'pd/pd.cpp'; then $(CYGPATH_W) 'pd/pd.cpp'; else $(CYGPATH_W) '$(srcdir)/pd/pd.cpp'; fi`
+
+mydb-msg.o: msg/msg.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-msg.o -MD -MP -MF $(DEPDIR)/mydb-msg.Tpo -c -o mydb-msg.o `test -f 'msg/msg.cpp' || echo '$(srcdir)/'`msg/msg.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-msg.Tpo $(DEPDIR)/mydb-msg.Po
+#	$(AM_V_CXX)source='msg/msg.cpp' object='mydb-msg.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-msg.o `test -f 'msg/msg.cpp' || echo '$(srcdir)/'`msg/msg.cpp
+
+mydb-msg.obj: msg/msg.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-msg.obj -MD -MP -MF $(DEPDIR)/mydb-msg.Tpo -c -o mydb-msg.obj `if test -f 'msg/msg.cpp'; then $(CYGPATH_W) 'msg/msg.cpp'; else $(CYGPATH_W) '$(srcdir)/msg/msg.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-msg.Tpo $(DEPDIR)/mydb-msg.Po
+#	$(AM_V_CXX)source='msg/msg.cpp' object='mydb-msg.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-msg.obj `if test -f 'msg/msg.cpp'; then $(CYGPATH_W) 'msg/msg.cpp'; else $(CYGPATH_W) '$(srcdir)/msg/msg.cpp'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique

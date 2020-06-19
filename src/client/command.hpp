@@ -58,6 +58,23 @@ class InsertCommand:public ICommand
 	protected:
 		int handleReply();
 };
+
+class DeleteCommand:public ICommand
+{
+	public:
+		int execute(ossSocket &sock,std::vector<std::string> &argVec);
+	protected:
+		int handleReply();
+};
+
+class QueryCommand:public ICommand
+{
+	public:
+		int execute(ossSocket &sock,std::vector<std::string> &argVec);
+	protected:
+		int handleReply();
+};
+
 class ConnectCommand:public ICommand
 {
 	public:
@@ -81,5 +98,12 @@ class HelpCommand:public ICommand
                 int execute(ossSocket &sock,std::vector<std::string> &argVec);
 };
 
+class SnapshotCommand:public ICommand
+{
+	public:
+		int execute(ossSocket &sock,std::vector<std::string> &argVec);
+	protected:
+		int handleReply();
+};
 
 #endif 

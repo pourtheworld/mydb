@@ -759,7 +759,8 @@ edb-command.o: client/command.cpp /usr/include/stdc-predef.h \
  ../boost/boost/thread/thread_time.hpp \
  ../boost/boost/config/abi_prefix.hpp \
  ../boost/boost/config/abi_suffix.hpp include/ossSocket.hpp \
- include/core.hpp client/commandFactory.hpp include/pd.hpp
+ include/core.hpp client/commandFactory.hpp include/pd.hpp \
+ include/msg.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -2584,3 +2585,5 @@ include/core.hpp:
 client/commandFactory.hpp:
 
 include/pd.hpp:
+
+include/msg.hpp:
