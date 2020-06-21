@@ -5,6 +5,10 @@ autoscan: warning: missing AC_CHECK_FUNCS([gethostname]) wanted by:
 	oss/ossSocket.cpp:580
 autoscan: warning: missing AC_CHECK_FUNCS([gettimeofday]) wanted by: 
 	pd/pd.cpp:100
+autoscan: warning: missing AC_CHECK_FUNCS([memmove]) wanted by: 
+	dms/dms.cpp:364
+autoscan: warning: missing AC_CHECK_FUNCS([munmap]) wanted by: 
+	oss/ossMmapFile.cpp:33
 autoscan: warning: missing AC_CHECK_FUNCS([select]) wanted by: 
 	oss/ossSocket.cpp:221
 	oss/ossSocket.cpp:291
@@ -12,6 +16,8 @@ autoscan: warning: missing AC_CHECK_FUNCS([select]) wanted by:
 	oss/ossSocket.cpp:474
 autoscan: warning: missing AC_CHECK_FUNCS([socket]) wanted by: 
 	oss/ossSocket.cpp:114
+autoscan: warning: missing AC_CHECK_FUNCS([strdup]) wanted by: 
+	dms/dms.cpp:66
 autoscan: warning: missing AC_CHECK_HEADERS([arpa/inet.h]) wanted by: 
 	include/core.hpp:23
 autoscan: warning: missing AC_CHECK_HEADERS([fcntl.h]) wanted by: 
@@ -25,6 +31,10 @@ autoscan: warning: missing AC_CHECK_HEADERS([sys/socket.h]) wanted by:
 	include/core.hpp:21
 autoscan: warning: missing AC_CHECK_HEADERS([sys/time.h]) wanted by: 
 	include/core.hpp:11
+autoscan: warning: missing AC_FUNC_MMAP wanted by: 
+	oss/ossMmapFile.cpp:75
+autoscan: warning: missing AC_TYPE_OFF_T wanted by: 
+	oss/ossMmapFile.cpp:54
 autoscan: warning: missing AC_TYPE_PID_T wanted by: 
 	include/ossUtil.hpp:30
 autoscan: warning: missing AC_TYPE_SSIZE_T wanted by: 

@@ -113,7 +113,8 @@ am_mydb_OBJECTS = mydb-pmdMain.$(OBJEXT) mydb-pmdTcpListener.$(OBJEXT) \
 	mydb-json.$(OBJEXT) mydb-oid.$(OBJEXT) mydb-base64.$(OBJEXT) \
 	mydb-md5.$(OBJEXT) mydb-nonce.$(OBJEXT) \
 	mydb-ossSocket.$(OBJEXT) mydb-ossPrimitiveFileOp.$(OBJEXT) \
-	mydb-pd.$(OBJEXT) mydb-msg.$(OBJEXT)
+	mydb-ossMmapFile.$(OBJEXT) mydb-pd.$(OBJEXT) \
+	mydb-msg.$(OBJEXT) mydb-dms.$(OBJEXT)
 mydb_OBJECTS = $(am_mydb_OBJECTS)
 mydb_DEPENDENCIES =
 mydb_LINK = $(CXXLD) $(mydb_CXXFLAGS) $(CXXFLAGS) $(mydb_LDFLAGS) \
@@ -302,8 +303,8 @@ mydb_SOURCES = \
 	pmd/pmd.cpp	pmd/pmdEDU.cpp pmd/pmdEDUMgr.cpp	pmd/pmdAgent.cpp\
 	bson/src/bsonobj.cpp bson/src/util/json.cpp bson/src/oid.cpp	\
 	bson/src/lib/base64.cpp bson/src/lib/md5.cpp bson/src/lib/nonce.cpp	\
-	oss/ossSocket.cpp oss/ossPrimitiveFileOp.cpp	\
-	pd/pd.cpp msg/msg.cpp
+	oss/ossSocket.cpp oss/ossPrimitiveFileOp.cpp	oss/ossMmapFile.cpp	\
+	pd/pd.cpp msg/msg.cpp	dms/dms.cpp
 
 edb_SOURCES = \
 	client/edb.cpp client/command.cpp client/commandFactory.cpp	\
@@ -444,11 +445,13 @@ include ./$(DEPDIR)/edb-ossSocket.Po
 include ./$(DEPDIR)/edb-pd.Po
 include ./$(DEPDIR)/mydb-base64.Po
 include ./$(DEPDIR)/mydb-bsonobj.Po
+include ./$(DEPDIR)/mydb-dms.Po
 include ./$(DEPDIR)/mydb-json.Po
 include ./$(DEPDIR)/mydb-md5.Po
 include ./$(DEPDIR)/mydb-msg.Po
 include ./$(DEPDIR)/mydb-nonce.Po
 include ./$(DEPDIR)/mydb-oid.Po
+include ./$(DEPDIR)/mydb-ossMmapFile.Po
 include ./$(DEPDIR)/mydb-ossPrimitiveFileOp.Po
 include ./$(DEPDIR)/mydb-ossSocket.Po
 include ./$(DEPDIR)/mydb-pd.Po
@@ -866,6 +869,20 @@ mydb-ossPrimitiveFileOp.obj: oss/ossPrimitiveFileOp.cpp
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ossPrimitiveFileOp.obj `if test -f 'oss/ossPrimitiveFileOp.cpp'; then $(CYGPATH_W) 'oss/ossPrimitiveFileOp.cpp'; else $(CYGPATH_W) '$(srcdir)/oss/ossPrimitiveFileOp.cpp'; fi`
 
+mydb-ossMmapFile.o: oss/ossMmapFile.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-ossMmapFile.o -MD -MP -MF $(DEPDIR)/mydb-ossMmapFile.Tpo -c -o mydb-ossMmapFile.o `test -f 'oss/ossMmapFile.cpp' || echo '$(srcdir)/'`oss/ossMmapFile.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-ossMmapFile.Tpo $(DEPDIR)/mydb-ossMmapFile.Po
+#	$(AM_V_CXX)source='oss/ossMmapFile.cpp' object='mydb-ossMmapFile.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ossMmapFile.o `test -f 'oss/ossMmapFile.cpp' || echo '$(srcdir)/'`oss/ossMmapFile.cpp
+
+mydb-ossMmapFile.obj: oss/ossMmapFile.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-ossMmapFile.obj -MD -MP -MF $(DEPDIR)/mydb-ossMmapFile.Tpo -c -o mydb-ossMmapFile.obj `if test -f 'oss/ossMmapFile.cpp'; then $(CYGPATH_W) 'oss/ossMmapFile.cpp'; else $(CYGPATH_W) '$(srcdir)/oss/ossMmapFile.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-ossMmapFile.Tpo $(DEPDIR)/mydb-ossMmapFile.Po
+#	$(AM_V_CXX)source='oss/ossMmapFile.cpp' object='mydb-ossMmapFile.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ossMmapFile.obj `if test -f 'oss/ossMmapFile.cpp'; then $(CYGPATH_W) 'oss/ossMmapFile.cpp'; else $(CYGPATH_W) '$(srcdir)/oss/ossMmapFile.cpp'; fi`
+
 mydb-pd.o: pd/pd.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-pd.o -MD -MP -MF $(DEPDIR)/mydb-pd.Tpo -c -o mydb-pd.o `test -f 'pd/pd.cpp' || echo '$(srcdir)/'`pd/pd.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-pd.Tpo $(DEPDIR)/mydb-pd.Po
@@ -893,6 +910,20 @@ mydb-msg.obj: msg/msg.cpp
 #	$(AM_V_CXX)source='msg/msg.cpp' object='mydb-msg.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-msg.obj `if test -f 'msg/msg.cpp'; then $(CYGPATH_W) 'msg/msg.cpp'; else $(CYGPATH_W) '$(srcdir)/msg/msg.cpp'; fi`
+
+mydb-dms.o: dms/dms.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-dms.o -MD -MP -MF $(DEPDIR)/mydb-dms.Tpo -c -o mydb-dms.o `test -f 'dms/dms.cpp' || echo '$(srcdir)/'`dms/dms.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-dms.Tpo $(DEPDIR)/mydb-dms.Po
+#	$(AM_V_CXX)source='dms/dms.cpp' object='mydb-dms.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-dms.o `test -f 'dms/dms.cpp' || echo '$(srcdir)/'`dms/dms.cpp
+
+mydb-dms.obj: dms/dms.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-dms.obj -MD -MP -MF $(DEPDIR)/mydb-dms.Tpo -c -o mydb-dms.obj `if test -f 'dms/dms.cpp'; then $(CYGPATH_W) 'dms/dms.cpp'; else $(CYGPATH_W) '$(srcdir)/dms/dms.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-dms.Tpo $(DEPDIR)/mydb-dms.Po
+#	$(AM_V_CXX)source='dms/dms.cpp' object='mydb-dms.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-dms.obj `if test -f 'dms/dms.cpp'; then $(CYGPATH_W) 'dms/dms.cpp'; else $(CYGPATH_W) '$(srcdir)/dms/dms.cpp'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
