@@ -7,6 +7,7 @@
 #include    "dmsRecord.hpp"
 //include    "ixmBucket.hpp"
 #include    <vector>
+#include    "ixmBucket.hpp"
 
 #define DMS_EXTEND_SIZE 65536//文件每次扩张的最小长度
 #define DMS_PAGESIZE    4194304//数据页的大小为4M
@@ -81,7 +82,7 @@ struct dmsPageHeader
     unsigned int _size; //页大小
     unsigned int _flag; //页状态
     unsigned int _numSlots; //slot个数
-    unsigned int _slotOffset; //slot开始偏移
+    unsigned int _slotOffset; //最后一个slot的偏移
     unsigned int _freeSpace;    //空闲空间的大小
     unsigned int _freeOffset;   //空闲空间的偏移
     char _data[0];
@@ -108,9 +109,9 @@ private:
     ossSLatch   _mutex;
     ossXLatch   _extendMutex;
     char *_pFileName;
-    //ixmBucketManager *_ixmBucketMgr;
+    ixmBucketManager *_ixmBucketMgr;
 public:
-    dmsFile();
+    dmsFile(ixmBucketManager *ixmBucketMgr);
         ~dmsFile();
 
     //包括打开文件+装载文件 initNew和LoadData
@@ -144,7 +145,7 @@ public:
     {
       return getNumSegments() * DMS_PAGES_PER_SEGMENT ;
     }
-    //根据pageID把页映射到内存地址上
+    //根据pageID获得page地址
     inline char *pageToOffset(PAGEID pageID)
     {
         if(pageID>=getNumPages())   return NULL;

@@ -5,6 +5,7 @@
 #include "../bson/src/bson.h"
 #include "pmd.hpp"
 #include "msg.hpp"
+#include "dms.hpp"
 
 
 using namespace bson;
@@ -40,6 +41,9 @@ static int pmdProcessAgentRequest(char *pReceiveBuffer,
     int opCode=header->opCode;
     EDB_KRCB *krcb=pmdGetKRCB();
 
+    //获得rtnMgr
+    rtn *rtnMgr=krcb->getRtnMgr();
+
    //先将断开标志置为false
    *disconnect=false;
 
@@ -67,11 +71,27 @@ static int pmdProcessAgentRequest(char *pReceiveBuffer,
             rc=EDB_INVALIDARG;
             goto error;
          }
-         try
-         {  
-            //我们将它打印出来
+         try//先检查对象本身有无错误，再检查第一个字段是不是id，最后交给rtnMgr来插入
+         {  //从buffer中读取BSON对象
             BSONObj insertor(pInsertorBuffer);
-            PD_LOG(PDEVENT,"Insert: insertor: %s",insertor.toString().c_str());
+            PD_LOG ( PDEVENT,
+                     "Insert: insertor: %s",
+                     insertor.toString().c_str() ) ;
+            BSONObjIterator it(insertor); //BSON对象的一个迭代器
+            BSONElement ele=*it; //获取BSON对象的第一个元素
+            const char *tmp=ele.fieldName(); //获取第一个元素的字段名
+            rc=strcmp(tmp,gKeyFieldName); //比较是不是"id"
+            if ( rc )
+            {
+               PD_LOG ( PDERROR,
+                        "First element in inserted record is not _id" ) ;
+               probe = 25 ;
+               rc = EDB_NO_ID ;
+               goto error ;
+            }
+
+            rc=rtnMgr->rtnInsert(insertor);
+
          }
          catch(const std::exception& e)
          {
@@ -95,26 +115,13 @@ static int pmdProcessAgentRequest(char *pReceiveBuffer,
          }
          //暂时用简单的打印
          PD_LOG(PDEVENT,"Query condition: %s",recordID.toString().c_str());
-         try
-         {//假的BSONobj查询返回对象，测试效果用
-            BSONObjBuilder b;
-            b.append("query","test");
-            b.append("result",1);
-            retObj=b.obj();
-         }
-         catch(const std::exception& e)
-         {
-            PD_LOG(PDERROR,"Failed to create return BSONObj: %s",e.what());
-            probe=55;
-            rc=EDB_INVALIDARG;
-            goto error;
-         }
+         rc = rtnMgr->rtnFind ( recordID, retObj ) ;
       }
       else if(OP_DELETE==opCode)
       {
          PD_LOG(PDDEBUG,"Delete request received");
          //同样是解封，不过直接用BSONObj获取key了
-         rc=msgExtractQuery(pReceiveBuffer,recordID);
+         rc=msgExtractDelete(pReceiveBuffer,recordID);
          if(rc)
          {
             PD_LOG(PDERROR,"Failed to read delete packet");
@@ -124,6 +131,7 @@ static int pmdProcessAgentRequest(char *pReceiveBuffer,
          }
          //暂时用简单的打印
          PD_LOG(PDEVENT,"Delete condition: %s",recordID.toString().c_str());
+         rc=rtnMgr->rtnRemove(recordID);
       }
       else if(OP_SNAPSHOT==opCode)
       {

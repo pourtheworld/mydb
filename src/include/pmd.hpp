@@ -3,6 +3,7 @@
 
 #include "core.hpp"
 #include "pmdEDUMgr.hpp"
+#include "rtn.hpp"
 //数据库当前状态
 enum EDB_DB_STATUS
 {
@@ -37,6 +38,7 @@ private:
 	EDB_DB_STATUS _dbStatus;
 private :
     pmdEDUMgr     _eduMgr ;
+	rtn 		  _rtnMgr ;
 public:
 	EDB_KRCB()
 	{
@@ -74,6 +76,10 @@ public:
 	pmdEDUMgr *getEDUMgr ()
     {
       return &_eduMgr ;
+    }
+	rtn *getRtnMgr ()
+    {
+      return &_rtnMgr ;
     }
 };
 

@@ -3,10 +3,13 @@
 
 using namespace bson;
 
-const char *gKetyFieldName=DMS_KEY_FIELDNAME;
+const char *gKeyFieldName=DMS_KEY_FIELDNAME;
 
 
-dmsFile::dmsFile():_header(NULL),_pFileName(NULL){}
+dmsFile::dmsFile(ixmBucketManager *ixmBucketMgr):_header(NULL),_pFileName(NULL)
+{
+   _ixmBucketMgr=ixmBucketMgr;
+}
 
 dmsFile::~dmsFile()
 {
@@ -14,19 +17,256 @@ dmsFile::~dmsFile()
     close();    //mmap的各种段解映射
 }
 
+//插入流程
+//1.检查record大小及是否包含_id
+//2.检查获取数据库锁，检查有无符合记录大小的页
+//3.没有则释放数据库锁，尝试获得扩展锁来扩展segment
+//4.检查页内可用空间是否足够，如果不够进行重组
+//5.检查可用空间是否存的下记录，存不下报错
+//6.更新slot
+//7.将记录拷贝进页
+//8.更新记录头信息
+//9.更新页头信息
+//10.更新数据库信息
+//11.释放数据库锁
 int dmsFile::insert(BSONObj &record,BSONObj &outRecord,dmsRecordID &rid)
 {
-    return EDB_OK;
+   int rc                     = EDB_OK ;
+   PAGEID pageID              = 0 ;
+   char *page                 = NULL ;
+   dmsPageHeader *pageHeader  = NULL ;
+   int recordSize             = 0 ;
+   SLOTOFF offsetTemp         = 0 ;
+   const char *pGKeyFieldName = NULL ;
+   dmsRecord recordHeader ;
+
+   //1. 检查record大小
+   recordSize=record.objsize();
+   if((unsigned int)recordSize>DMS_MAX_RECORD)
+   {
+      rc = EDB_INVALIDARG ;
+      PD_LOG ( PDERROR, "record cannot bigger than 4MB" ) ;
+      goto error ;
+   }  
+   pGKeyFieldName=gKeyFieldName;
+   //getFieldDottedOrArray返回指定域名中的内容，意思是检查record是否带有_id
+   if(record.getFieldDottedOrArray(pGKeyFieldName).eoo())
+   {
+      rc = EDB_INVALIDARG ;
+      PD_LOG ( PDERROR, "record must be with _id" ) ;
+      goto error ;
+   }
+
+
+retry:
+   _mutex.get();  //2.检查获取数据库锁，检查有无符合记录大小的页
+   pageID=_findPage(recordSize+sizeof(dmsRecord));
+   if(DMS_INVALID_PAGEID==pageID)
+   {
+      _mutex.release();//3.没有则释放数据库锁，尝试获得扩展锁来扩展segment
+      if(_extendMutex.try_get())//尝试得到扩展锁
+      {
+         rc=_extendSegment();//得到了则扩展段
+         if(rc)
+         {
+            PD_LOG ( PDERROR, "Failed to extend segment, rc = %d", rc ) ;
+            _extendMutex.release () ;
+            goto error ;
+         }
+      }
+      else
+      {
+         _extendMutex.get();//如果没能得到，说明其它线程正在扩展，等待扩展完后得到锁。
+      }
+      //此时已经得到了扩展锁，将其释放即可。
+      _extendMutex.release();
+      goto retry;//重新检查有无可用页
+   }
+//4.检查页内可用空间是否足够，如果不够进行重组
+   page=pageToOffset(pageID);
+   if(!page)//根据pageid找到页
+   {
+      rc = EDB_SYS ;
+      PD_LOG ( PDERROR, "Failed to find the page" ) ;
+      goto error_releasemutex ;
+   }
+
+   pageHeader=(dmsPageHeader*)page;//赋予页头
+   //先检查标识是否为页
+   if(memcmp(pageHeader->_eyeCatcher,DMS_PAGE_EYECATCHER,DMS_PAGE_EYECATCHER_LEN)!=0)
+   {
+      rc = EDB_SYS ;
+      PD_LOG ( PDERROR, "Invalid page header" ) ;
+      goto error_releasemutex ;
+   }
+
+   //5.检查可用空间是否存的下记录，存不下报错
+   //当可用空间大于可用空间偏移-slot最后的偏移，也就是实际可用空间
+   //并且当slot最后偏移+记录长度+记录头长度+slot长度大于了可用空间偏移
+   //意味着空间不够了，我们尝试重组
+   if((pageHeader->_freeSpace>pageHeader->_freeOffset-pageHeader->_slotOffset)&&
+      (pageHeader->_slotOffset+recordSize+sizeof(dmsRecord)+sizeof(SLOTID)>pageHeader->_freeOffset))
+      {
+         _recoverSpace(page);
+      }
+
+   //如果记录长度+记录头长度+slot长度大于了可用空间 或者
+   //页可用空间偏移-页slot最后偏移小于+记录长度+记录头长度+slot长度
+   //都意味着可用空间还是不够，此时我们没有办法只能报错
+   if(pageHeader->_freeSpace<recordSize+sizeof(dmsRecord)+sizeof(SLOTID)||
+      pageHeader->_freeOffset-pageHeader->_slotOffset<recordSize+sizeof(dmsRecord)+sizeof(SLOTID))
+   {
+      PD_LOG ( PDERROR, "Something big wrong!!" ) ;
+      rc = EDB_SYS ;
+      goto error_releasemutex ;
+   }
+   //注意上述的比较，一个是基于空间的，一个是基于偏移的
+
+   //此时我们把当前记录所在的偏移记录下来，并修改记录的头数据
+   offsetTemp=pageHeader->_freeOffset-recordSize-sizeof(dmsRecord);
+   recordHeader._size=recordSize+sizeof(dmsRecord);
+   recordHeader._flag=DMS_RECORD_FLAG_NORMAL;
+
+   //6.更新slot
+   *(SLOTOFF*)(page+sizeof(dmsPageHeader)+pageHeader->_numSlots*sizeof(SLOTOFF))=offsetTemp;
+
+   //7.将记录拷贝进页
+   memcpy(page+offsetTemp,(char*)&recordHeader,sizeof(dmsRecord));
+   memcpy(page+offsetTemp+sizeof(dmsRecord),record.objdata(),recordSize);
+   outRecord=BSONObj(page+offsetTemp+sizeof(dmsRecord));//将记录传出
+
+   //8.更新记录头信息
+   rid._pageID=pageID;
+   rid._slotID=pageHeader->_numSlots;
+
+   //9.更新页头信息
+   pageHeader->_numSlots++;
+   pageHeader->_slotOffset+=sizeof(SLOTID);
+   pageHeader->_freeOffset=offsetTemp;
+
+   //10.更新数据库信息
+   //注意第二个形参，正值代表释放空间，负值代表占用空间
+   _updateFreeSpace(pageHeader,-(recordSize+sizeof(SLOTID)+sizeof(dmsRecord)),pageID);
+
+   //11.释放空间锁
+
+   _mutex.release();
+done :
+   return rc ;
+error_releasemutex :
+   _mutex.release() ;
+error :
+   goto done ;
 }
 
+//删除过程
+//1.依靠record id寻找对应的page
+//2.依靠page地址，slotid寻找到对应的slot
+//3.将slot值空，更新record头信息，更新数据库信息
 int dmsFile::remove(dmsRecordID &rid)
 {
-    return EDB_OK;
+   int rc=EDB_OK;
+   SLOTOFF slot=0;
+   char *page=NULL;
+   dmsRecord *recordHeader=NULL;
+   dmsPageHeader *pageHeader=NULL;
+   std::pair<std::multimap<unsigned int, PAGEID>::iterator,
+             std::multimap<unsigned int, PAGEID>::iterator> ret ;
+   _mutex.get();
+
+   //1.依靠record id寻找对应的page
+   page=pageToOffset(rid._pageID);
+   if ( !page )
+   {
+      rc = EDB_SYS ;
+      PD_LOG ( PDERROR, "Failed to find the apge for %u;%u",
+               rid._pageID, rid._slotID ) ;
+      goto error ;
+   }
+
+   //2.依靠page地址，slotid寻找到对应的slot
+   rc=_searchSlot(page,rid,slot);
+   if ( rc )
+   {
+      PD_LOG ( PDERROR, "Failed to search slot, rc = %d", rc ) ;
+      goto error ;
+   }
+   if ( DMS_SLOT_EMPTY == slot ) //如果slot本身已经是空的，这个记录已经被清除了
+   {
+      rc = EDB_SYS ;
+      PD_LOG ( PDERROR, "The record is dropped" ) ;
+      goto error ;
+   }
+
+   ////3.将slot值空，更新record头信息，更新数据库信息
+   pageHeader=(dmsPageHeader*)page;
+   *(SLOTID*)(page+sizeof(dmsPageHeader)+rid._slotID*sizeof(SLOTID))=DMS_SLOT_EMPTY;
+   recordHeader=(dmsRecord*)(page+slot);
+   recordHeader->_flag=DMS_RECORD_FLAG_DROPPED;
+   _updateFreeSpace(pageHeader,recordHeader->_size,rid._pageID);
+
+done :
+   _mutex.release () ;
+   return rc ;
+error :
+   goto done ;
+
 }
 
+//寻找过程 与删除过程类似，多了一个步骤需要将记录传出
+//1.根据recordid找到对应页
+//2.根据page和slotid找到slot
+//3.找到record复制给result
 int dmsFile::find(dmsRecordID &rid,BSONObj &result)
 {
-    return EDB_OK;
+   int rc                  = EDB_OK ;
+   SLOTOFF slot            = 0 ;
+   char *page              = NULL ;
+   dmsRecord *recordHeader = NULL ;
+
+   _mutex.get_shared();
+
+   //1.根据recordid找到对应页
+   page = pageToOffset ( rid._pageID ) ;
+   if ( !page )
+   {
+      rc = EDB_SYS ;
+      PD_LOG ( PDERROR, "Failed to find the page" ) ;
+      goto error ;
+   }
+
+   //2.根据page和slotid找到slot
+    rc = _searchSlot ( page, rid, slot ) ;
+   if ( rc )
+   {
+      PD_LOG ( PDERROR, "Failed to search slot, rc = %d", rc ) ;
+      goto error ;
+   }
+   
+   if ( DMS_SLOT_EMPTY == slot )
+   {
+      rc = EDB_SYS ;
+      PD_LOG ( PDERROR, "The record is dropped" ) ;
+      goto error ;
+   }
+
+   //3.找到record复制给result
+   
+   recordHeader = (dmsRecord *)( page + slot ) ;
+   
+   if ( DMS_RECORD_FLAG_DROPPED == recordHeader->_flag )
+   {
+      rc = EDB_SYS ;
+      PD_LOG ( PDERROR, "This data is dropped" ) ;
+      goto error ;
+   }
+   //虽然没有标明要复制多长，但是BSONObj本身会记录长度
+   result = BSONObj ( page + slot + sizeof(dmsRecord) ).copy () ;
+done :
+   _mutex.release_shared () ;
+   return rc ;
+error :
+   goto done ;
 }
 
 //将changeSize指定大小的页更新到freespace里（仅仅是映射更新）
@@ -90,7 +330,6 @@ getfilesize:
     }
 
     rc=_loadData(); //装载数据
-    rc = _loadData () ;
     PD_RC_CHECK ( rc, PDERROR, "Failed to load data, rc = %d", rc ) ;
 done :
    return rc ;
@@ -306,24 +545,28 @@ int dmsFile::_loadData()
                   pair<unsigned int, PAGEID>(pageHeader->_freeSpace, k ) ) ;
             slotID = ( SLOTID ) pageHeader->_numSlots ;
             recordID._pageID = (PAGEID) k ;
-            /*
+            
+            //将每个记录都建立对应的索引放到内存
             for ( unsigned int s = 0; s < slotID; ++s )
-            {
+            {  //获得record偏移
                slotOffset = *(SLOTOFF*)(data+k*DMS_PAGESIZE +
                             sizeof(dmsPageHeader ) + s*sizeof(SLOTID) ) ;
                if ( DMS_SLOT_EMPTY == slotOffset )
                {
                   continue ;
                }
+               //获得record内容
                bson = BSONObj ( data + k*DMS_PAGESIZE +
                                 slotOffset + sizeof(dmsRecord) ) ;
                recordID._slotID = (SLOTID)s ;
+               //检查索引是否已经存在
                rc = _ixmBucketMgr->isIDExist ( bson ) ;
                PD_RC_CHECK ( rc, PDERROR, "Failed to call isIDExist, rc = %d", rc ) ;
+               //根据bson对象和recordID建立索引
                rc = _ixmBucketMgr->createIndex ( bson, recordID ) ;
                PD_RC_CHECK ( rc, PDERROR, "Failed to call ixm createIndex, rc = %d", rc ) ;
             }
-            */ //更新index
+            
          }
       } // for ( int i = 0; i < numSegments; ++i )
    } // if ( numSegments > 0 )

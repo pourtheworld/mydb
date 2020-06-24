@@ -6,7 +6,7 @@ autoscan: warning: missing AC_CHECK_FUNCS([gethostname]) wanted by:
 autoscan: warning: missing AC_CHECK_FUNCS([gettimeofday]) wanted by: 
 	pd/pd.cpp:100
 autoscan: warning: missing AC_CHECK_FUNCS([memmove]) wanted by: 
-	dms/dms.cpp:364
+	dms/dms.cpp:607
 autoscan: warning: missing AC_CHECK_FUNCS([munmap]) wanted by: 
 	oss/ossMmapFile.cpp:33
 autoscan: warning: missing AC_CHECK_FUNCS([select]) wanted by: 
@@ -17,7 +17,7 @@ autoscan: warning: missing AC_CHECK_FUNCS([select]) wanted by:
 autoscan: warning: missing AC_CHECK_FUNCS([socket]) wanted by: 
 	oss/ossSocket.cpp:114
 autoscan: warning: missing AC_CHECK_FUNCS([strdup]) wanted by: 
-	dms/dms.cpp:66
+	dms/dms.cpp:306
 autoscan: warning: missing AC_CHECK_HEADERS([arpa/inet.h]) wanted by: 
 	include/core.hpp:23
 autoscan: warning: missing AC_CHECK_HEADERS([fcntl.h]) wanted by: 

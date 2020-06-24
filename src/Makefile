@@ -113,8 +113,9 @@ am_mydb_OBJECTS = mydb-pmdMain.$(OBJEXT) mydb-pmdTcpListener.$(OBJEXT) \
 	mydb-json.$(OBJEXT) mydb-oid.$(OBJEXT) mydb-base64.$(OBJEXT) \
 	mydb-md5.$(OBJEXT) mydb-nonce.$(OBJEXT) \
 	mydb-ossSocket.$(OBJEXT) mydb-ossPrimitiveFileOp.$(OBJEXT) \
-	mydb-ossMmapFile.$(OBJEXT) mydb-pd.$(OBJEXT) \
-	mydb-msg.$(OBJEXT) mydb-dms.$(OBJEXT)
+	mydb-ossMmapFile.$(OBJEXT) mydb-ossHash.$(OBJEXT) \
+	mydb-pd.$(OBJEXT) mydb-msg.$(OBJEXT) mydb-dms.$(OBJEXT) \
+	mydb-rtn.$(OBJEXT) mydb-ixmBucket.$(OBJEXT)
 mydb_OBJECTS = $(am_mydb_OBJECTS)
 mydb_DEPENDENCIES =
 mydb_LINK = $(CXXLD) $(mydb_CXXFLAGS) $(CXXFLAGS) $(mydb_LDFLAGS) \
@@ -304,7 +305,8 @@ mydb_SOURCES = \
 	bson/src/bsonobj.cpp bson/src/util/json.cpp bson/src/oid.cpp	\
 	bson/src/lib/base64.cpp bson/src/lib/md5.cpp bson/src/lib/nonce.cpp	\
 	oss/ossSocket.cpp oss/ossPrimitiveFileOp.cpp	oss/ossMmapFile.cpp	\
-	pd/pd.cpp msg/msg.cpp	dms/dms.cpp
+	oss/ossHash.cpp	\
+	pd/pd.cpp msg/msg.cpp	dms/dms.cpp		rtn/rtn.cpp	ixm/ixmBucket.cpp
 
 edb_SOURCES = \
 	client/edb.cpp client/command.cpp client/commandFactory.cpp	\
@@ -446,11 +448,13 @@ include ./$(DEPDIR)/edb-pd.Po
 include ./$(DEPDIR)/mydb-base64.Po
 include ./$(DEPDIR)/mydb-bsonobj.Po
 include ./$(DEPDIR)/mydb-dms.Po
+include ./$(DEPDIR)/mydb-ixmBucket.Po
 include ./$(DEPDIR)/mydb-json.Po
 include ./$(DEPDIR)/mydb-md5.Po
 include ./$(DEPDIR)/mydb-msg.Po
 include ./$(DEPDIR)/mydb-nonce.Po
 include ./$(DEPDIR)/mydb-oid.Po
+include ./$(DEPDIR)/mydb-ossHash.Po
 include ./$(DEPDIR)/mydb-ossMmapFile.Po
 include ./$(DEPDIR)/mydb-ossPrimitiveFileOp.Po
 include ./$(DEPDIR)/mydb-ossSocket.Po
@@ -462,6 +466,7 @@ include ./$(DEPDIR)/mydb-pmdEDUMgr.Po
 include ./$(DEPDIR)/mydb-pmdMain.Po
 include ./$(DEPDIR)/mydb-pmdOptions.Po
 include ./$(DEPDIR)/mydb-pmdTcpListener.Po
+include ./$(DEPDIR)/mydb-rtn.Po
 
 .cpp.o:
 	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -883,6 +888,20 @@ mydb-ossMmapFile.obj: oss/ossMmapFile.cpp
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ossMmapFile.obj `if test -f 'oss/ossMmapFile.cpp'; then $(CYGPATH_W) 'oss/ossMmapFile.cpp'; else $(CYGPATH_W) '$(srcdir)/oss/ossMmapFile.cpp'; fi`
 
+mydb-ossHash.o: oss/ossHash.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-ossHash.o -MD -MP -MF $(DEPDIR)/mydb-ossHash.Tpo -c -o mydb-ossHash.o `test -f 'oss/ossHash.cpp' || echo '$(srcdir)/'`oss/ossHash.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-ossHash.Tpo $(DEPDIR)/mydb-ossHash.Po
+#	$(AM_V_CXX)source='oss/ossHash.cpp' object='mydb-ossHash.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ossHash.o `test -f 'oss/ossHash.cpp' || echo '$(srcdir)/'`oss/ossHash.cpp
+
+mydb-ossHash.obj: oss/ossHash.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-ossHash.obj -MD -MP -MF $(DEPDIR)/mydb-ossHash.Tpo -c -o mydb-ossHash.obj `if test -f 'oss/ossHash.cpp'; then $(CYGPATH_W) 'oss/ossHash.cpp'; else $(CYGPATH_W) '$(srcdir)/oss/ossHash.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-ossHash.Tpo $(DEPDIR)/mydb-ossHash.Po
+#	$(AM_V_CXX)source='oss/ossHash.cpp' object='mydb-ossHash.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ossHash.obj `if test -f 'oss/ossHash.cpp'; then $(CYGPATH_W) 'oss/ossHash.cpp'; else $(CYGPATH_W) '$(srcdir)/oss/ossHash.cpp'; fi`
+
 mydb-pd.o: pd/pd.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-pd.o -MD -MP -MF $(DEPDIR)/mydb-pd.Tpo -c -o mydb-pd.o `test -f 'pd/pd.cpp' || echo '$(srcdir)/'`pd/pd.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-pd.Tpo $(DEPDIR)/mydb-pd.Po
@@ -924,6 +943,34 @@ mydb-dms.obj: dms/dms.cpp
 #	$(AM_V_CXX)source='dms/dms.cpp' object='mydb-dms.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-dms.obj `if test -f 'dms/dms.cpp'; then $(CYGPATH_W) 'dms/dms.cpp'; else $(CYGPATH_W) '$(srcdir)/dms/dms.cpp'; fi`
+
+mydb-rtn.o: rtn/rtn.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-rtn.o -MD -MP -MF $(DEPDIR)/mydb-rtn.Tpo -c -o mydb-rtn.o `test -f 'rtn/rtn.cpp' || echo '$(srcdir)/'`rtn/rtn.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-rtn.Tpo $(DEPDIR)/mydb-rtn.Po
+#	$(AM_V_CXX)source='rtn/rtn.cpp' object='mydb-rtn.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-rtn.o `test -f 'rtn/rtn.cpp' || echo '$(srcdir)/'`rtn/rtn.cpp
+
+mydb-rtn.obj: rtn/rtn.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-rtn.obj -MD -MP -MF $(DEPDIR)/mydb-rtn.Tpo -c -o mydb-rtn.obj `if test -f 'rtn/rtn.cpp'; then $(CYGPATH_W) 'rtn/rtn.cpp'; else $(CYGPATH_W) '$(srcdir)/rtn/rtn.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-rtn.Tpo $(DEPDIR)/mydb-rtn.Po
+#	$(AM_V_CXX)source='rtn/rtn.cpp' object='mydb-rtn.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-rtn.obj `if test -f 'rtn/rtn.cpp'; then $(CYGPATH_W) 'rtn/rtn.cpp'; else $(CYGPATH_W) '$(srcdir)/rtn/rtn.cpp'; fi`
+
+mydb-ixmBucket.o: ixm/ixmBucket.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-ixmBucket.o -MD -MP -MF $(DEPDIR)/mydb-ixmBucket.Tpo -c -o mydb-ixmBucket.o `test -f 'ixm/ixmBucket.cpp' || echo '$(srcdir)/'`ixm/ixmBucket.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-ixmBucket.Tpo $(DEPDIR)/mydb-ixmBucket.Po
+#	$(AM_V_CXX)source='ixm/ixmBucket.cpp' object='mydb-ixmBucket.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ixmBucket.o `test -f 'ixm/ixmBucket.cpp' || echo '$(srcdir)/'`ixm/ixmBucket.cpp
+
+mydb-ixmBucket.obj: ixm/ixmBucket.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -MT mydb-ixmBucket.obj -MD -MP -MF $(DEPDIR)/mydb-ixmBucket.Tpo -c -o mydb-ixmBucket.obj `if test -f 'ixm/ixmBucket.cpp'; then $(CYGPATH_W) 'ixm/ixmBucket.cpp'; else $(CYGPATH_W) '$(srcdir)/ixm/ixmBucket.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/mydb-ixmBucket.Tpo $(DEPDIR)/mydb-ixmBucket.Po
+#	$(AM_V_CXX)source='ixm/ixmBucket.cpp' object='mydb-ixmBucket.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mydb_CXXFLAGS) $(CXXFLAGS) -c -o mydb-ixmBucket.obj `if test -f 'ixm/ixmBucket.cpp'; then $(CYGPATH_W) 'ixm/ixmBucket.cpp'; else $(CYGPATH_W) '$(srcdir)/ixm/ixmBucket.cpp'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
