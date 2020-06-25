@@ -900,8 +900,8 @@ mydb-pmd.o: pmd/pmd.cpp /usr/include/stdc-predef.h include/pmd.hpp \
  bson/src/bsonmisc.h bson/src/bsonobjbuilder.h bson/src/bsonobjiterator.h \
  bson/src/bson-inl.h bson/src/bson_db.h bson/src/util/time_support.h \
  include/dms.hpp include/ossMmapFile.hpp include/ossPrimitiveFileOp.hpp \
- include/dmsRecord.hpp include/ixmBucket.hpp include/pmdOptions.hpp \
- ../boost/boost/program_options.hpp \
+ include/dmsRecord.hpp include/ixmBucket.hpp include/monCB.hpp \
+ include/pmdOptions.hpp ../boost/boost/program_options.hpp \
  ../boost/boost/program_options/options_description.hpp \
  ../boost/boost/program_options/config.hpp \
  ../boost/boost/program_options/errors.hpp \
@@ -3105,6 +3105,8 @@ include/ossPrimitiveFileOp.hpp:
 include/dmsRecord.hpp:
 
 include/ixmBucket.hpp:
+
+include/monCB.hpp:
 
 include/pmdOptions.hpp:
 

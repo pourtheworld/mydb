@@ -1608,3 +1608,116 @@ File:pmd/pmdAgent.cpp
 Message:
 Error processing Agent request, rc=-16
 
+2020-06-23-22.58.20.515136	Level:ERROR
+PID:14222                                TID:14225
+Function:pmdProcessAgentRequest          Line:199
+File:pmd/pmdAgent.cpp
+Message:
+Invalid argument is received,probe: 60
+
+2020-06-23-22.58.20.518184	Level:ERROR
+PID:14222                                TID:14225
+Function:pmdAgentEntryPoint              Line:363
+File:pmd/pmdAgent.cpp
+Message:
+Error processing Agent request, rc=-2
+
+2020-06-23-22.58.20.518879	Level:WARNING
+PID:14222                                TID:14225
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-23-22.58.22.030468	Level:EVENT
+PID:14222                                TID:14225
+Function:pmdEDUEntryPoint                Line:162
+File:pmd/pmdEDU.cpp
+Message:
+EDU 2 is forced
+
+2020-06-25-01.51.53.596224	Level:EVENT
+PID:11208                                TID:11209
+Function:pmdTcpListenerEntryPoint        Line:31
+File:pmd/pmdTcpListener.cpp
+Message:
+Listening on port_test 48127
+
+
+2020-06-25-01.52.42.940484	Level:EVENT
+PID:11208                                TID:11267
+Function:pmdProcessAgentRequest          Line:118
+File:pmd/pmdAgent.cpp
+Message:
+Query condition: { _id: 1 }
+
+2020-06-25-01.52.42.940595	Level:ERROR
+PID:11208                                TID:11267
+Function:findIndex                       Line:257
+File:ixm/ixmBucket.cpp
+Message:
+record _id does not exist, hashNum = 422304363
+
+2020-06-25-01.52.42.940612	Level:ERROR
+PID:11208                                TID:11267
+Function:findIndex                       Line:74
+File:ixm/ixmBucket.cpp
+Message:
+Failed to find index, rc = -16
+
+2020-06-25-01.52.42.940622	Level:ERROR
+PID:11208                                TID:11267
+Function:rtnFind                         Line:91
+File:rtn/rtn.cpp
+Message:
+Failed to call ixm findIndex, rc = -16
+
+2020-06-25-01.52.42.940633	Level:ERROR
+PID:11208                                TID:11267
+Function:pmdAgentEntryPoint              Line:367
+File:pmd/pmdAgent.cpp
+Message:
+Error processing Agent request, rc=-16
+
+2020-06-25-01.53.32.676375	Level:EVENT
+PID:11208                                TID:11267
+Function:pmdProcessAgentRequest          Line:79
+File:pmd/pmdAgent.cpp
+Message:
+Insert: insertor: { _id: 1, hello: "world" }
+
+2020-06-25-01.53.43.655924	Level:EVENT
+PID:11208                                TID:11267
+Function:pmdProcessAgentRequest          Line:118
+File:pmd/pmdAgent.cpp
+Message:
+Query condition: { _id: 1 }
+
+2020-06-25-01.53.52.054158	Level:ERROR
+PID:11208                                TID:11267
+Function:pmdProcessAgentRequest          Line:203
+File:pmd/pmdAgent.cpp
+Message:
+Invalid argument is received,probe: 60
+
+2020-06-25-01.53.52.054206	Level:ERROR
+PID:11208                                TID:11267
+Function:pmdAgentEntryPoint              Line:367
+File:pmd/pmdAgent.cpp
+Message:
+Error processing Agent request, rc=-2
+
+2020-06-25-01.53.52.054246	Level:WARNING
+PID:11208                                TID:11267
+Function:recv                            Line:321
+File:oss/ossSocket.cpp
+Message:
+Peer unexpected shutdown
+
+2020-06-25-01.53.54.574977	Level:EVENT
+PID:11208                                TID:11267
+Function:pmdEDUEntryPoint                Line:162
+File:pmd/pmdEDU.cpp
+Message:
+EDU 2 is forced
+

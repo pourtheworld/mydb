@@ -6,7 +6,7 @@
 #include "pmd.hpp"
 #include "msg.hpp"
 #include "dms.hpp"
-
+#include "monCB.hpp"
 
 using namespace bson;
 using namespace std;
@@ -91,6 +91,7 @@ static int pmdProcessAgentRequest(char *pReceiveBuffer,
             }
 
             rc=rtnMgr->rtnInsert(insertor);
+            if(!rc)  krcb->getMonAppCB().increaseInsertTimes();
 
          }
          catch(const std::exception& e)
@@ -116,6 +117,7 @@ static int pmdProcessAgentRequest(char *pReceiveBuffer,
          //暂时用简单的打印
          PD_LOG(PDEVENT,"Query condition: %s",recordID.toString().c_str());
          rc = rtnMgr->rtnFind ( recordID, retObj ) ;
+         if(!rc)  krcb->getMonAppCB().increaseQueryTimes();
       }
       else if(OP_DELETE==opCode)
       {
@@ -132,17 +134,19 @@ static int pmdProcessAgentRequest(char *pReceiveBuffer,
          //暂时用简单的打印
          PD_LOG(PDEVENT,"Delete condition: %s",recordID.toString().c_str());
          rc=rtnMgr->rtnRemove(recordID);
+         if(!rc)  krcb->getMonAppCB().increaseDelTimes();
       }
       else if(OP_SNAPSHOT==opCode)
       {
          PD_LOG(PDDEBUG,"Snapshot request received");
+         MonAppCB monAppCB=krcb->getMonAppCB();
          try
          {//假的BSONobj快照返回对象，测试效果用
             BSONObjBuilder b;
-            b.append("insertTimes",100);
-            b.append("delTimes",1000);
-            b.append("queryTimes",100);
-            b.append("serverRunTime",100);
+            b.append("insertTimes",monAppCB.getInsertTimes());
+            b.append("delTimes",monAppCB.getDelTimes());
+            b.append("queryTimes",monAppCB.getQueryTimes());
+            b.append("serverRunTime",monAppCB.getServerRunTime());
             retObj=b.obj();
          }
          catch(const std::exception& e)

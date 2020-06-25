@@ -4,6 +4,8 @@ autoscan: warning: missing AC_CHECK_FUNCS([gethostbyname]) wanted by:
 autoscan: warning: missing AC_CHECK_FUNCS([gethostname]) wanted by: 
 	oss/ossSocket.cpp:580
 autoscan: warning: missing AC_CHECK_FUNCS([gettimeofday]) wanted by: 
+	mon/monCB.cpp:7
+	mon/monCB.cpp:66
 	pd/pd.cpp:100
 autoscan: warning: missing AC_CHECK_FUNCS([memmove]) wanted by: 
 	dms/dms.cpp:607
@@ -31,6 +33,7 @@ autoscan: warning: missing AC_CHECK_HEADERS([sys/socket.h]) wanted by:
 	include/core.hpp:21
 autoscan: warning: missing AC_CHECK_HEADERS([sys/time.h]) wanted by: 
 	include/core.hpp:11
+	mon/monCB.cpp:2
 autoscan: warning: missing AC_FUNC_MMAP wanted by: 
 	oss/ossMmapFile.cpp:75
 autoscan: warning: missing AC_TYPE_OFF_T wanted by: 

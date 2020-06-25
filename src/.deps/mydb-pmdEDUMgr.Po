@@ -900,7 +900,8 @@ mydb-pmdEDUMgr.o: pmd/pmdEDUMgr.cpp /usr/include/stdc-predef.h \
  bson/src/bsonmisc.h bson/src/bsonobjbuilder.h bson/src/bsonobjiterator.h \
  bson/src/bson-inl.h bson/src/bson_db.h bson/src/util/time_support.h \
  include/dms.hpp include/ossMmapFile.hpp include/ossPrimitiveFileOp.hpp \
- include/dmsRecord.hpp include/ixmBucket.hpp include/pmdEDUMgr.hpp
+ include/dmsRecord.hpp include/ixmBucket.hpp include/monCB.hpp \
+ include/pmdEDUMgr.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -3091,5 +3092,7 @@ include/ossPrimitiveFileOp.hpp:
 include/dmsRecord.hpp:
 
 include/ixmBucket.hpp:
+
+include/monCB.hpp:
 
 include/pmdEDUMgr.hpp:

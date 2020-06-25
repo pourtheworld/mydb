@@ -4,6 +4,8 @@
 #include "core.hpp"
 #include "pmdEDUMgr.hpp"
 #include "rtn.hpp"
+#include "monCB.hpp"
+
 //数据库当前状态
 enum EDB_DB_STATUS
 {
@@ -39,6 +41,7 @@ private:
 private :
     pmdEDUMgr     _eduMgr ;
 	rtn 		  _rtnMgr ;
+	MonAppCB	  _monAppCB;
 public:
 	EDB_KRCB()
 	{
@@ -54,6 +57,7 @@ public:
 	inline const char* getLogFilePath(){	return _logFilePath;	}
 	inline const char* getSvcName(){	return _svcName;	}
 	inline int getMaxPool(){	return _maxPool;	}
+	inline MonAppCB& getMonAppCB(){	return _monAppCB;	}
 	inline void setDBStatus(EDB_DB_STATUS status){	_dbStatus=status;	}
 	void setDataFilePath(const char *pPath)
 	{
